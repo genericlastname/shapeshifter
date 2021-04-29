@@ -6,8 +6,10 @@ from lark import Lark
 app = Flask(__name__)
 
 grammar = r'''
-    start : [colorn] shapen ["at " pair] ["size of " pair]
+    start : [colorn] shapen [at] [sizeof]
     pair  : NUMBER","NUMBER
+    at    : "at" pair      -> position
+    sizeof: "size of" pair -> size
     colorn: COLOR
           | hex
     hex   : "#"(DIGIT|LETTER)(DIGIT|LETTER)(DIGIT|LETTER)(DIGIT|LETTER)(DIGIT|LETTER)(DIGIT|LETTER)
@@ -32,34 +34,42 @@ def index():
         w = 100
         h = 100
         shape = None
+        js_draw_command = None
 
         statement = request.form.get('statement')
-        parsed = parser.parse(statement)
+        if statement:
+            parsed = parser.parse(statement)
 
-        # print(parsed.children[1].children[1])
-        if parsed.children[0].data == 'colorn':
-            color_name = parsed.children[0].children[0]
-            if color_name == 'red':
-                color = '#ff0000'
-            elif color_name == 'blue':
-                color = '#0000ff'
-            elif color_name == 'green':
-                color = '#00ff00'
-            elif color_name == 'yellow':
-                color = '#ffff00'
-            else:
-                color = color_name
-        elif parsed.children[0].data == 'shapen':
-            shape = parsed.children[0].children[0]
+            for tree in parsed.children:
+                if tree.data == 'colorn':
+                    color_name = tree.children[0]
+                    if color_name == 'red':
+                        color = '#ff0000'
+                    elif color_name == 'blue':
+                        color = '#0000ff'
+                    elif color_name == 'green':
+                        color = '#00ff00'
+                    elif color_name == 'yellow':
+                        color = '#ffff00'
+                    else:
+                        color = color_name
+                elif tree.data == 'shapen':
+                    shape = tree.children[0]
+                elif tree.data == 'position':
+                    x = tree.children[0].children[0]
+                    y = tree.children[0].children[1]
+                elif tree.data == 'size':
+                    x = tree.children[0].children[0]
+                    y = tree.children[0].children[1]
 
-        if len(parsed.children) > 1:
-            x = int(parsed.children[1].children[0])
-            y = int(parsed.children[1].children[1])
-        elif len(parsed.children) > 2:
-            w = int(parsed.children[2].children[0])
-            h = int(parsed.children[2].children[1])
-
-    return render_template('index.html');
+            print(f'x: {x} y: {y} w: {w} h: {h} color: {color}')
+            # Generate shapes
+            if shape == 'rectangle':
+                js_draw_command = f'''
+                ctx.fillStyle = {color};
+                ctx.fillRect({x}, {y}, {w}, {h});
+                '''
+    return render_template('index.html', js_draw_command=js_draw_command);
 
 
 if __name__ == '__main__':
