@@ -27,15 +27,15 @@ parser = Lark(grammar)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        color='#000000'
-        x = 0
-        y = 0
-        w = 100
-        h = 100
-        shape = None
-        js_draw_command = None
+    command_string = None
+    color='#000000'
+    x = 0
+    y = 0
+    w = 100
+    h = 100
+    shape = None
 
+    if request.method == 'POST':
         statement = request.form.get('statement')
         if statement:
             parsed = parser.parse(statement)
@@ -56,20 +56,14 @@ def index():
                 elif tree.data == 'shapen':
                     shape = tree.children[0]
                 elif tree.data == 'position':
-                    x = tree.children[0].children[0]
-                    y = tree.children[0].children[1]
+                    x = int(tree.children[0].children[0])
+                    y = int(tree.children[0].children[1])
                 elif tree.data == 'size':
-                    x = tree.children[0].children[0]
-                    y = tree.children[0].children[1]
+                    w = int(tree.children[0].children[0])
+                    h = int(tree.children[0].children[1])
 
-            print(f'x: {x} y: {y} w: {w} h: {h} color: {color}')
-            # Generate shapes
-            if shape == 'rectangle':
-                js_draw_command = f'''
-                ctx.fillStyle = {color};
-                ctx.fillRect({x}, {y}, {w}, {h});
-                '''
-    return render_template('index.html', js_draw_command=js_draw_command);
+            print(f'shape: {shape} x: {x} y: {y} w: {w} h: {h} color: {color}')
+    return render_template('index.html', x=x, y=y, w=w, h=h, shape=shape)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
   <title>Shapeshifter</title>
 </head>
 {% block body %}
-<body>
+<body onload="draw()">
 <div class="header">
   <h1>Shapeshifter</h1>
 </div>
@@ -22,13 +22,7 @@ Example: `red rectange` -- `#1f35fa oval at 50,50` -- `blue triangle size of 300
 </p>
 </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
-  <script>
-    var canvas = document.getElementById("mainCanvas");
-    var ctx = canvas.getContext("2d");
-    {{ js_draw_command }}
-  </script>
-
-  <script type="text/javascript">
+  <script tyoe="text/javascript">
     $(document).on('submit', '#input-form',function(e) {
       e.preventDefault();
       $.ajax({
@@ -38,6 +32,9 @@ Example: `red rectange` -- `#1f35fa oval at 50,50` -- `blue triangle size of 300
           statement: $("#statement").val()
         },
         success:function() {
+          var canvas = document.getElementById("mainCanvas");
+          var ctx = canvas.getContext("2d");
+          ctx.fillRect({{ x }}, {{ y }}, {{ w }}, {{ h }});
         }
       })
     });
