@@ -2,18 +2,42 @@
 <head>
   <title>Shapeshifter</title>
 </head>
+{% block body %}
 <body>
 <div class="header">
   <h1>Shapeshifter</h1>
 </div>
 <div class="canvas-area">
+  <p>Canvas size: 500x500px</p>
   <canvas id="mainCanvas" width="500" height="500" style="border:2px solid #000000;"></canvas>
 </div>
 <div class="input">
-<form method="POST">
-  <input type="text" id="statement" placeholder="Enter commands">
-  <input type="submit" id="submit-button" value="Submit">
+<form method="POST" id="input-form">
+  <input type="text" name="statement" id="statement" placeholder="Enter commands">
+  <button type="submit">Submit</button>
 </form>
+<p>
+TUTORIAL: type commands in the format "color shape (optional) at x,y size of w,h"<br>
+Example: `red rectange` -- `#1f35fa oval at 50,50` -- `blue triangle size of 300, 90 at 120,120`
+</p>
 </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+  <script type="text/javascript">
+    $(document).on('submit', '#input-form',function(e) {
+      console.log('hello');
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '/',
+        data: {
+          statement: $("#statement").val()
+        },
+        success:function() {
+        }
+      })
+    });
+    $('#input-form')[0].reset();
+  </script>
 </body>
+{% endblock %}
 </html>

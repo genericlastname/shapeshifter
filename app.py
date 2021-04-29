@@ -1,6 +1,8 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for
 from lark import Lark 
+
+
 app = Flask(__name__)
 
 grammar = r'''
@@ -18,14 +20,15 @@ grammar = r'''
     %import common.WS
     %ignore WS
     '''
+parser = Lark(grammar)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html', message='by Kyle Brown');
+    if request.method == 'POST':
+        statement = request.form.get('statement')
+        print(parser.parse(statement).pretty())
+    return render_template('index.html');
 
 
 if __name__ == '__main__':
-    # app.run(host='127.0.0.1', port=8000, debug=True)
-    parser = Lark(grammar)
-
-    print(parser.parse('#fff000 oval at 50,50 size of 400,300').pretty())
+    app.run(host='127.0.0.1', port=8000, debug=True)
