@@ -34,6 +34,7 @@ def index():
     w = 100
     h = 100
     shape = None
+    draw_info = {}
 
     if request.method == 'POST':
         statement = request.form.get('statement')
@@ -63,7 +64,8 @@ def index():
                     h = int(tree.children[0].children[1])
 
             print(f'shape: {shape} x: {x} y: {y} w: {w} h: {h} color: {color}')
-    return render_template('index.html', x=x, y=y, w=w, h=h, shape=shape)
+            draw_info = { 'x': x, 'y': y, 'w': w, 'h': h, 'shape': shape, 'color': color }
+    return render_template('index.html', draw_info=draw_info)
 
 
 if __name__ == '__main__':
